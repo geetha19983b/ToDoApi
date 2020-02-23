@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,6 +16,8 @@ using Microsoft.Extensions.Options;
 using Todo.Business;
 
 using Todo.Repository;
+//kfka
+using HostedServices = Microsoft.Extensions.Hosting;
 
 namespace TodoApi
 {
@@ -49,6 +52,16 @@ namespace TodoApi
                 sp.GetRequiredService<IOptions<MongoDbSettings>>().Value);
 
             services.AddScoped<IRepository, MongoRepository>();
+
+            //kafka
+            //services.AddSingleton<HostedServices.IHostedService, ProcessOrdersService>();
+            var producerConfig = new ProducerConfig();
+            var consumerConfig = new ConsumerConfig();
+            Configuration.Bind("producer", producerConfig);
+            Configuration.Bind("consumer", consumerConfig);
+
+            services.AddSingleton<ProducerConfig>(producerConfig);
+            services.AddSingleton<ConsumerConfig>(consumerConfig);
 
         }
 
